@@ -1,0 +1,103 @@
+{
+  "resources": [
+    {
+      "title": "Coordination Section",
+      "url": "https://nutech.edu.pk/about/coord-office",
+      "audience": "public",
+      "default": true,
+      "keywords": ["contact", "office", "coordination", "general", "inquiry", "information", "help"],
+      "description": "General inquiries and university coordination."
+    },
+    {
+      "title": "Registrar Office",
+      "url": "https://nutech.edu.pk/about/registrar-office",
+      "audience": "both",
+      "keywords": ["registrar", "transcript", "certificate", "record", "enrollment", "registration"],
+      "description": "Academic records, transcripts and certificates."
+    },
+    {
+      "title": "BS programs",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["bs", "bachelor", "program", "undergraduate", "degree", "eligibility"],
+      "description": "Bachelor's programs offered, with eligibility and duration."
+    },
+    {
+      "title": "MS programs",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["ms", "master", "program", "postgraduate", "eligibility"],
+      "description": "Master's programs, eligibility and admission requirements."
+    },
+    {
+      "title": "PhD programs",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["phd", "doctorate", "program", "research", "eligibility"],
+      "description": "Doctoral programs and research areas."
+    },
+    {
+      "title": "Departments and faculties",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["department", "faculty", "school", "institute", "list"],
+      "description": "All departments and faculties with their contacts."
+    },
+    {
+      "title": "Admissions",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["admission", "apply", "application", "merit", "entry", "test", "deadline", "document"],
+      "description": "How to apply, deadlines and required documents."
+    },
+    {
+      "title": "Fee structure",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["fee", "tuition", "cost", "charges", "price", "semester"],
+      "description": "Tuition and other charges by program."
+    },
+    {
+      "title": "Scholarships",
+      "url": "TODO",
+      "audience": "public",
+      "keywords": ["scholarship", "financial", "aid", "need", "discount"],
+      "description": "Scholarships and financial aid, with eligibility."
+    },
+    {
+      "title": "Hostel",
+      "url": "TODO",
+      "audience": "both",
+      "keywords": ["hostel", "accommodation", "room", "residence", "boarding"],
+      "description": "Hostel availability, charges and application."
+    },
+    {
+      "title": "Fee submission",
+      "url": "TODO",
+      "audience": "student",
+      "keywords": ["fee", "submit", "submission", "pay", "challan", "bank", "payment"],
+      "description": "How to submit semester fees."
+    },
+    {
+      "title": "Late fee policy",
+      "url": "TODO",
+      "audience": "student",
+      "keywords": ["late", "fine", "fee", "due", "penalty", "overdue"],
+      "description": "Late fine rules and deadlines."
+    },
+    {
+      "title": "Attendance policy",
+      "url": "TODO",
+      "audience": "student",
+      "keywords": ["attendance", "minimum", "shortage", "absent", "leave"],
+      "description": "Minimum attendance and what happens below it."
+    },
+    {
+      "title": "Course registration",
+      "url": "TODO",
+      "audience": "student",
+      "keywords": ["course", "register", "registration", "drop", "add", "credit", "hours"],
+      "description": "How to register, add or drop courses, and credit hour rules."
+    }
+  ]
+}
