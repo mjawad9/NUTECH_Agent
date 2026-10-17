@@ -6,8 +6,18 @@ import requests
 from bs4 import BeautifulSoup
 
 BASE_URL = "https://nutech.edu.pk/"   # confirm this is the official NUTECH address
-MAX_PAGES = 15                         # how many pages to read from the site
-CACHE_SECONDS = 6 * 3600               # reload the site every 6 hours
+
+# Add the exact URLs of pages you know have important info (departments, fees, admissions).
+# These are read first, before the crawler follows links.
+SEED_URLS = [
+    "https://nutech.edu.pk/about/coord-office",
+    "https://nutech.edu.pk/about/registrar-office",
+    # "https://nutech.edu.pk/departments",   <- paste real department/faculty page URLs here
+    # "https://nutech.edu.pk/admissions",
+]
+
+MAX_PAGES = 30
+CACHE_SECONDS = 6 * 3600
 SKIP_EXTENSIONS = (".pdf", ".jpg", ".jpeg", ".png", ".gif", ".zip", ".doc", ".docx", ".xls", ".xlsx")
 HEADERS = {"User-Agent": "NUTECH-Smart-Assistant/1.0"}
 
@@ -27,10 +37,10 @@ def _fetch(url: str):
 
 def _page_chunks(url: str, html: str) -> list:
     soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "nav", "footer", "header", "noscript"]):
+    for tag in soup(["script", "style", "noscript"]):   # menus and headers are kept
         tag.decompose()
     lines = [re.sub(r"\s+", " ", line).strip() for line in soup.get_text("\n").split("\n")]
-    return [{"source": url, "text": line} for line in lines if len(line) > 40]
+    return [{"source": url, "text": line} for line in lines if len(line) > 15]
 
 
 def _links(url: str, html: str) -> list:
@@ -47,7 +57,8 @@ def _links(url: str, html: str) -> list:
 def load_site() -> list:
     if _cache["chunks"] and time.time() - _cache["time"] < CACHE_SECONDS:
         return _cache["chunks"]
-    chunks, queue, seen = [], [BASE_URL], set()
+    chunks, seen = [], set()
+    queue = list(SEED_URLS) + [BASE_URL]
     while queue and len(seen) < MAX_PAGES:
         url = queue.pop(0)
         if url in seen:
@@ -62,11 +73,21 @@ def load_site() -> list:
     return chunks
 
 
-def search_site(query: str, top_k: int = 4) -> str:
-    words = set(re.findall(r"\w+", query.lower()))
+def _words(text: str) -> set:
+    # Simple plural handling: "departments" matches "department", "faculties" matches "faculty"
+    out = set()
+    for w in re.findall(r"[a-z]+", text.lower()):
+        if len(w) > 3 and w.endswith("s"):
+            out.add(w[:-1])
+        out.add(w)
+    return out
+
+
+def search_site(query: str, top_k: int = 6) -> str:
+    words = _words(query)
     scored = []
     for chunk in load_site():
-        overlap = len(words & set(re.findall(r"\w+", chunk["text"].lower())))
+        overlap = len(words & _words(chunk["text"]))
         if overlap:
             scored.append((overlap, chunk))
     scored.sort(key=lambda x: x[0], reverse=True)
