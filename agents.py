@@ -3,10 +3,13 @@ import os
 import re
 from pathlib import Path
 
+import litellm
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.tools import tool
 
 from config import get_secret
+
+litellm.drop_params = True  # drop request fields Groq doesn't accept (e.g. cache_breakpoint)
 
 KB_PATH = Path(__file__).parent / "data" / "knowledge_base.json"
 if not KB_PATH.exists():
