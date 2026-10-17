@@ -17,12 +17,12 @@ KB = json.loads(KB_PATH.read_text(encoding="utf-8"))
 
 
 def get_llm() -> LLM:
-    api_key = get_secret("OPENAI_API_KEY")
+    api_key = get_secret("GROQ_API_KEY")
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set. Add it to Streamlit secrets or your .env file.")
-    os.environ["OPENAI_API_KEY"] = api_key
+        raise RuntimeError("GROQ_API_KEY is not set. Add it to Streamlit secrets or your .env file.")
+    os.environ["GROQ_API_KEY"] = api_key
     return LLM(
-        model=get_secret("OPENAI_MODEL", "openai/gpt-4o-mini"),
+        model=get_secret("GROQ_MODEL", "groq/llama-3.3-70b-versatile"),
         api_key=api_key,
         temperature=0.2,
     )
