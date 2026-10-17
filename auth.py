@@ -14,10 +14,10 @@ def load_students() -> dict:
 
 
 def authenticate(nutech_id: str, access_code: str):
-    """Return the student's record (without internal fields) if the ID exists and the code matches."""
+    """Return the student's record if the NUTECH ID exists and the access code matches ACCESS_CODE in Secrets."""
     expected_code = get_secret("ACCESS_CODE")
     if not expected_code:
-        return None  # login is disabled until ACCESS_CODE is set in Secrets
+        return None  # login stays disabled until ACCESS_CODE is set in Secrets
     student_id = nutech_id.strip().upper()
     student = load_students().get(student_id)
     if not student:
