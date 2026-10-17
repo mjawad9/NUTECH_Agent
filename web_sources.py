@@ -10,10 +10,10 @@ BASE_URL = "https://nutech.edu.pk/"   # confirm this is the official NUTECH addr
 # Add the exact URLs of pages you know have important info (departments, fees, admissions).
 # These are read first, before the crawler follows links.
 SEED_URLS = [
-    "https://nutech.edu.pk/about/coord-office",
-    "https://nutech.edu.pk/about/registrar-office",
-    # "https://nutech.edu.pk/departments",   <- paste real department/faculty page URLs here
-    # "https://nutech.edu.pk/admissions",
+    "https://nutech.edu.pk/",
+    "https://nutech.edu.pk/admission/undergraduate/",
+     "https://nutech.edu.pk/program/postgraduate/",   <- paste real department/faculty page URLs here
+     "https://nutech.edu.pk/admissions",
 ]
 
 MAX_PAGES = 30
