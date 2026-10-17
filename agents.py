@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 
 from config import get_secret
+from web_sources import search_site
 
 KB_PATH = Path(__file__).parent / "data" / "knowledge_base.json"
 if not KB_PATH.exists():
@@ -31,7 +32,7 @@ def _search(section: dict, query: str, top_k: int = 3) -> str:
         scored.append((len(words & haystack), key, text))
     scored.sort(reverse=True)
     hits = [f"[{k}] {t}" for s, k, t in scored[:top_k] if s > 0]
-    return "\n\n".join(hits) or "No matching information found in the knowledge base."
+    return "\n\n".join(hits)
 
 
 def _candidate_models() -> list:
@@ -64,12 +65,13 @@ def _chat(system: str, user: str) -> str:
             return resp.json()["choices"][0]["message"]["content"].strip()
         errors.append(f"{model}: {resp.status_code} {resp.text[:150]}")
         if resp.status_code not in (400, 404):
-            break  # key or rate-limit problem: trying other models won't help
+            break  # key or rate-limit problem: other models won't help
     raise RuntimeError("No Groq model worked. " + " | ".join(errors))
 
 
 RULES = (
     "You are the NUTECH help desk assistant. Answer using ONLY the facts provided. "
+    "Facts marked with a web address come from the official NUTECH website; mention the page when useful. "
     "If a fact is missing or says TODO, say you don't have that information yet and suggest "
     "contacting the relevant NUTECH office. Never invent fees, dates, percentages or policies. "
     "Reply in the user's language (English or Roman Urdu/Urdu). Be concise, clear and friendly."
@@ -77,20 +79,27 @@ RULES = (
 
 
 def ask_public(query: str, history: str = "") -> str:
-    facts = _search(KB["public"], query)
-    system = f"{RULES}\n\nAudience: prospective (outside) student. Do not discuss private student data.\n\nFacts:\n{facts}"
+    kb_facts = _search(KB["public"], query)
+    web_facts = search_site(query)
+    facts = "\n\n".join(x for x in [kb_facts, web_facts] if x) or "No matching information found."
+    system = (
+        f"{RULES}\n\nAudience: prospective (outside) student. Do not discuss private student data.\n\n"
+        f"Facts:\n{facts}"
+    )
     user = f"Conversation so far:\n{history or '(none)'}\n\nQuestion: {query}"
     return _chat(system, user)
 
 
 def ask_student(query: str, student: dict, history: str = "") -> str:
-    facts = _search({**KB["student"], **KB["public"]}, query)
+    kb_facts = _search({**KB["student"], **KB["public"]}, query)
+    web_facts = search_site(query)
+    facts = "\n\n".join(x for x in [kb_facts, web_facts] if x) or "No matching policy facts found."
     record = json.dumps(student, indent=2)
     system = (
         f"{RULES}\n\nYou are talking to {student['name']} ({student['program']}). "
         "Use their own record for personal questions (dues, attendance, credit hours) and policies "
         "for general ones. Warn them if attendance is near or below the minimum or if fee is overdue.\n\n"
-        f"Student record:\n{record}\n\nPolicy facts:\n{facts}"
+        f"Student record (personal, from the university system):\n{record}\n\nPolicy and website facts:\n{facts}"
     )
     user = f"Conversation so far:\n{history or '(none)'}\n\nQuestion: {query}"
     return _chat(system, user)
