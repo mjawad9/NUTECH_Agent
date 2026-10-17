@@ -11,7 +11,8 @@
     "fee_structure_ms_phd": "TODO: MS/PhD fee structure.",
     "scholarships": "TODO: scholarships, financial aid, eligibility and how to apply.",
     "hostel_public": "TODO: hostel availability for new students, rooms, charges, application process.",
-    "contact": "TODO: admissions office phone, email, address, office hours."
+    "contact": "TODO: admissions office phone, email, address, office hours.",
+    "programs_bs": "BS programs at NUTECH: 1) BS Computer Engineering (4 years, Faculty of ..., eligibility: ...). 2) BS Software Engineering (4 years, ...). Add every program here. Source: NUTECH prospectus, https://nutech.edu.pk/..."
   },
   "student": {
     "late_fee_policy": "TODO: late fee fine per day/week, grace period, consequences of non-payment (e.g. result hold, registration block).",
