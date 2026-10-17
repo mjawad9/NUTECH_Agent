@@ -5,7 +5,7 @@ from pathlib import Path
 import requests
 
 from config import get_secret
-from web_sources import search_site
+from web_sources import search_site, tokens
 
 KB_PATH = Path(__file__).parent / "data" / "knowledge_base.json"
 if not KB_PATH.exists():
@@ -16,23 +16,39 @@ KB = json.loads(KB_PATH.read_text(encoding="utf-8"))
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Tried in order. A model Groq rejects (404) is skipped and the next one is used.
+# Tried in order after GROQ_MODEL from Secrets. A model Groq rejects (400/404) is skipped.
 FALLBACK_MODELS = [
     "openai/gpt-oss-20b",
     "llama-3.1-8b-instant",
     "meta-llama/llama-4-scout-17b-16e-instruct",
 ]
 
+# Always included for outsiders, as general background, when filled in.
+BACKGROUND_KEYS = ["about", "contact"]
 
-def _search(section: dict, query: str, top_k: int = 3) -> str:
-    words = set(re.findall(r"\w+", query.lower()))
+
+def _is_filled(text: str) -> bool:
+    return bool(text) and not text.strip().upper().startswith("TODO")
+
+
+def _kb_facts(section: dict, query: str, top_k: int = 4) -> list:
+    """Return the best matching knowledge-base entries, skipping placeholder (TODO) entries."""
+    q = tokens(query)
     scored = []
     for key, text in section.items():
-        haystack = set(re.findall(r"\w+", (key.replace("_", " ") + " " + text).lower()))
-        scored.append((len(words & haystack), key, text))
-    scored.sort(reverse=True)
-    hits = [f"[{k}] {t}" for s, k, t in scored[:top_k] if s > 0]
-    return "\n\n".join(hits)
+        if not _is_filled(text):
+            continue
+        score = 2 * len(q & tokens(key.replace("_", " "))) + len(q & tokens(text))
+        if score > 0:
+            scored.append((score, key, text))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    facts = [f"- [{key}] {text}" for _, key, text in scored[:top_k]]
+    for key in BACKGROUND_KEYS:
+        text = section.get(key, "")
+        line = f"- [{key}] {text}"
+        if _is_filled(text) and line not in facts:
+            facts.append(line)
+    return facts
 
 
 def _candidate_models() -> list:
@@ -53,7 +69,8 @@ def _chat(system: str, user: str) -> str:
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json={
                 "model": model,
-                "temperature": 0.2,
+                "temperature": 0.1,
+                "max_tokens": 800,
                 "messages": [
                     {"role": "system", "content": system},
                     {"role": "user", "content": user},
@@ -69,38 +86,55 @@ def _chat(system: str, user: str) -> str:
     raise RuntimeError("No Groq model worked. " + " | ".join(errors))
 
 
-RULES = (
-    "You are the NUTECH help desk assistant. Answer the question directly and completely using the facts provided. "
-    "Do not reply with only a link. Give the answer first, then add the official page as a source "
-    "(for example: 'For official details, see <link>'). "
-    "Only say you don't have the information when no fact covers it. In that case, say what you do know, "
-    "and name one specific office to contact. Never invent fees, dates, percentages or policies. "
-    "Reply in the user's language (English or Roman Urdu/Urdu). Be concise, clear and friendly."
-)
+RULES = """You are the NUTECH (National University of Technology, Islamabad) help desk assistant.
+
+How to answer:
+- Answer the question directly in the first sentence or two. Never reply with only a link.
+- Use the facts provided below as your only source of university-specific information. Do not add fees, dates, percentages, department names or policies from memory.
+- If the facts contain the answer, give it clearly. Mention the source web page when it helps the person find more detail.
+- If the facts only partly answer the question, give the part you know, say what is missing, and name the specific office to contact (use the contact facts if available).
+- If the facts do not answer the question at all, say so in one sentence and point to the Coordination Section or Registrar Office with their web address.
+- For lists (departments, programs, documents), use a short bulleted list.
+- Reply in the same language the person uses (English, or Roman Urdu/Urdu).
+- Be concise, warm and professional."""
+
+
+def _build_user_message(history: str, query: str) -> str:
+    return f"Recent conversation:\n{history or '(none)'}\n\nCurrent question: {query}"
 
 
 def ask_public(query: str, history: str = "") -> str:
-    kb_facts = _search(KB["public"], query)
-    web_facts = search_site(query)
-    facts = "\n\n".join(x for x in [kb_facts, web_facts] if x) or "No matching information found."
+    kb = _kb_facts(KB["public"], query)
+    web = search_site(query)
+    facts = "\n".join(kb)
+    if web:
+        facts += "\n\nFrom the NUTECH website:\n" + web
+    if not facts.strip():
+        facts = "No facts found for this question."
     system = (
-        f"{RULES}\n\nAudience: prospective (outside) student. Do not discuss private student data.\n\n"
+        f"{RULES}\n\n"
+        "Audience: a prospective (outside) student. Do not share private student information.\n\n"
         f"Facts:\n{facts}"
     )
-    user = f"Conversation so far:\n{history or '(none)'}\n\nQuestion: {query}"
-    return _chat(system, user)
+    return _chat(system, _build_user_message(history, query))
 
 
 def ask_student(query: str, student: dict, history: str = "") -> str:
-    kb_facts = _search({**KB["student"], **KB["public"]}, query)
-    web_facts = search_site(query)
-    facts = "\n\n".join(x for x in [kb_facts, web_facts] if x) or "No matching policy facts found."
+    kb = _kb_facts({**KB["student"], **KB["public"]}, query)
+    web = search_site(query)
+    facts = "\n".join(kb)
+    if web:
+        facts += "\n\nFrom the NUTECH website:\n" + web
+    if not facts.strip():
+        facts = "No policy facts found for this question."
     record = json.dumps(student, indent=2)
     system = (
-        f"{RULES}\n\nYou are talking to {student['name']} ({student['program']}). "
-        "Use their own record for personal questions (dues, attendance, credit hours) and policies "
-        "for general ones. Warn them if attendance is near or below the minimum or if fee is overdue.\n\n"
-        f"Student record (personal, from the university system):\n{record}\n\nPolicy and website facts:\n{facts}"
+        f"{RULES}\n\n"
+        f"You are talking to {student['name']} ({student['program']}, semester {student['semester']}). "
+        "Use their personal record for questions about their own dues, fines, attendance, courses, "
+        "credit hours and hostel. Use the facts for general policy. "
+        "Warn them clearly if attendance is at or below the minimum, or if a fee is overdue or has a late fine.\n\n"
+        f"Student record (this student only):\n{record}\n\n"
+        f"Policy and website facts:\n{facts}"
     )
-    user = f"Conversation so far:\n{history or '(none)'}\n\nQuestion: {query}"
-    return _chat(system, user)
+    return _chat(system, _build_user_message(history, query))
