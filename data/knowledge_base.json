@@ -1,0 +1,26 @@
+{
+  "_note": "PLACEHOLDER DATA. Replace every value with official, current NUTECH information before real use.",
+  "public": {
+    "about": "National University of Technology (NUTECH), Islamabad. TODO: add official description, campus address, contact numbers, email, website.",
+    "admissions_process": "TODO: steps to apply (online form, entry test, merit list, document requirements, deadlines).",
+    "programs_bs": "TODO: list BS programs offered (e.g. Computer Engineering, Software Engineering, Electrical Engineering, ...), eligibility and duration.",
+    "programs_ms": "TODO: list MS programs, eligibility, duration, admission requirements.",
+    "programs_phd": "TODO: list PhD programs, eligibility, research areas, admission requirements.",
+    "departments": "TODO: list departments/faculties with short description and contact.",
+    "fee_structure_bs": "TODO: admission fee, per-semester tuition per program, security deposit, other charges.",
+    "fee_structure_ms_phd": "TODO: MS/PhD fee structure.",
+    "scholarships": "TODO: scholarships, financial aid, eligibility and how to apply.",
+    "hostel_public": "TODO: hostel availability for new students, rooms, charges, application process.",
+    "contact": "TODO: admissions office phone, email, address, office hours."
+  },
+  "student": {
+    "late_fee_policy": "TODO: late fee fine per day/week, grace period, consequences of non-payment (e.g. result hold, registration block).",
+    "fee_submission_process": "TODO: step-by-step (bank challan / online banking / app), accounts office, how to confirm payment.",
+    "credit_hours_rules": "TODO: min/max credit hours per semester, how credit hours are calculated, overload rules.",
+    "attendance_policy": "TODO: minimum attendance percentage (e.g. 75-80%), shortage consequences, medical leave rules.",
+    "hostel_fee_process": "TODO: hostel fee amount, due dates, payment method, refund and security deposit rules.",
+    "course_registration": "TODO: how/when to register or drop/add courses.",
+    "exam_and_grading": "TODO: grading scale, CGPA rules, repeat/improvement policy.",
+    "student_issues": "TODO: whom to contact for academic, fee, IT, hostel, and discipline problems (with emails/phones)."
+  }
+}
