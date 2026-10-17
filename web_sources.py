@@ -12,7 +12,7 @@ BASE_URL = "https://nutech.edu.pk/"   # confirm this is the official NUTECH addr
 SEED_URLS = [
     "https://nutech.edu.pk/",
     "https://nutech.edu.pk/admission/undergraduate/",
-     "https://nutech.edu.pk/program/postgraduate/",   <- paste real department/faculty page URLs here
+     "https://nutech.edu.pk/program/postgraduate/",
      "https://nutech.edu.pk/admissions",
 ]
 
