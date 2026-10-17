@@ -1,4 +1,4 @@
-# NUTECH Smart Assistant (CrewAI + Streamlit + elevenlabs)
+# NUTECH Smart Assistant (CrewAI + Streamlit + groq)
 
 ## Setup
 ```bash
