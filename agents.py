@@ -15,6 +15,13 @@ KB = json.loads(KB_PATH.read_text(encoding="utf-8"))
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
+# Tried in order. A model Groq rejects (404) is skipped and the next one is used.
+FALLBACK_MODELS = [
+    "openai/gpt-oss-20b",
+    "llama-3.1-8b-instant",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+]
+
 
 def _search(section: dict, query: str, top_k: int = 3) -> str:
     words = set(re.findall(r"\w+", query.lower()))
@@ -27,28 +34,38 @@ def _search(section: dict, query: str, top_k: int = 3) -> str:
     return "\n\n".join(hits) or "No matching information found in the knowledge base."
 
 
+def _candidate_models() -> list:
+    preferred = get_secret("GROQ_MODEL")
+    models = [preferred] if preferred else []
+    models += [m for m in FALLBACK_MODELS if m not in models]
+    return [m.replace("groq/", "") for m in models]
+
+
 def _chat(system: str, user: str) -> str:
     api_key = get_secret("GROQ_API_KEY")
     if not api_key:
-        raise RuntimeError("GROQ_API_KEY is not set. Add it to Streamlit secrets or your .env file.")
-    model = get_secret("GROQ_MODEL", "llama-3.3-70b-versatile")
-    model = model.replace("groq/", "")  # accept either "groq/model" or "model"
-    resp = requests.post(
-        GROQ_URL,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={
-            "model": model,
-            "temperature": 0.2,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-        },
-        timeout=60,
-    )
-    if resp.status_code != 200:
-        raise RuntimeError(f"Groq error {resp.status_code}: {resp.text[:300]}")
-    return resp.json()["choices"][0]["message"]["content"].strip()
+        raise RuntimeError("GROQ_API_KEY is not set. Add it to Streamlit secrets.")
+    errors = []
+    for model in _candidate_models():
+        resp = requests.post(
+            GROQ_URL,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "model": model,
+                "temperature": 0.2,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+            },
+            timeout=60,
+        )
+        if resp.status_code == 200:
+            return resp.json()["choices"][0]["message"]["content"].strip()
+        errors.append(f"{model}: {resp.status_code} {resp.text[:150]}")
+        if resp.status_code not in (400, 404):
+            break  # key or rate-limit problem: trying other models won't help
+    raise RuntimeError("No Groq model worked. " + " | ".join(errors))
 
 
 RULES = (
