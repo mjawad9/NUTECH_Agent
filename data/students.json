@@ -1,0 +1,31 @@
+{
+  "NU-2022-001": {
+    "salt": "a6f9c76a55783a74",
+    "password_hash": "d9566cef07ae30ad28f2c3479bb976295cbb40595ef1114f875cc2027c0430d7",
+    "name": "Ali Khan",
+    "program": "BS Computer Engineering",
+    "semester": 5,
+    "courses": [
+      {"code": "CE-301", "title": "Digital Signal Processing", "credit_hours": 3},
+      {"code": "CE-305", "title": "Computer Architecture", "credit_hours": 3},
+      {"code": "CE-307", "title": "Embedded Systems (Lab)", "credit_hours": 1}
+    ],
+    "attendance": {"CE-301": 88, "CE-305": 72, "CE-307": 79},
+    "fee": {"semester_fee": 120000, "paid": 120000, "due": 0, "due_date": "2026-10-30", "late_fine": 0},
+    "hostel": {"allotted": false}
+  },
+  "NU-2023-014": {
+    "salt": "4bbcf99505e5d933",
+    "password_hash": "3b3b8b9c99e06e14a15b67dc8cd6ba84c4b9083d3ad872f4534586780aef69f1",
+    "name": "Sara Ahmed",
+    "program": "BS Software Engineering",
+    "semester": 3,
+    "courses": [
+      {"code": "SE-201", "title": "Data Structures", "credit_hours": 3},
+      {"code": "SE-203", "title": "Object Oriented Programming", "credit_hours": 3}
+    ],
+    "attendance": {"SE-201": 91, "SE-203": 68},
+    "fee": {"semester_fee": 115000, "paid": 60000, "due": 55000, "due_date": "2026-10-15", "late_fine": 500},
+    "hostel": {"allotted": true, "hostel_fee_due": 25000}
+  }
+}
