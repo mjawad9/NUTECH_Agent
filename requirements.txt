@@ -3,3 +3,4 @@ crewai[litellm]>=0.80.0
 crewai-tools>=0.14.0
 python-dotenv>=1.0.0
 requests>=2.31.0
+beautifulsoup4>=4.12.0
