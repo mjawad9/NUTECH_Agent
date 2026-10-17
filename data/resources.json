@@ -16,17 +16,17 @@
       "description": "Academic records, transcripts and certificates."
     },
     {
-      "title": "BS programs",
-      "url": "TODO",
+      "title": "Undergraduate (BS) programs",
+      "url": "https://nutech.edu.pk/academics/undergraduate/",
       "audience": "public",
-      "keywords": ["bs", "bachelor", "program", "undergraduate", "degree", "eligibility"],
-      "description": "Bachelor's programs offered, with eligibility and duration."
+      "keywords": ["bs", "bachelor", "undergraduate", "program", "degree", "ug", "eligibility", "course", "subject"],
+      "description": "BS programs: Civil, Mechanical, Electrical and Computer Engineering; Bachelor of Engineering Technology (Civil); Computer Science, Software Engineering, Artificial Intelligence, Cyber Security and Information Technology. Duration is 4 years. NUET entry test is required."
     },
     {
       "title": "MS programs",
       "url": "TODO",
       "audience": "public",
-      "keywords": ["ms", "master", "program", "postgraduate", "eligibility"],
+      "keywords": ["ms", "master", "postgraduate", "program", "eligibility"],
       "description": "Master's programs, eligibility and admission requirements."
     },
     {
@@ -47,8 +47,8 @@
       "title": "Admissions",
       "url": "TODO",
       "audience": "public",
-      "keywords": ["admission", "apply", "application", "merit", "entry", "test", "deadline", "document"],
-      "description": "How to apply, deadlines and required documents."
+      "keywords": ["admission", "apply", "application", "merit", "entry", "test", "nuet", "deadline", "document"],
+      "description": "How to apply, deadlines and required documents. The NUET entry test is mandatory for all undergraduate programs."
     },
     {
       "title": "Fee structure",
